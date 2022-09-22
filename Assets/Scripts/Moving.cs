@@ -6,10 +6,15 @@ using UnityEngine;
 public class Moving : NetworkBehaviour
 {
     public CharacterController _characterController;
-    public Transform cam;
-    public float playerSpeed = 9.0f;
-    public float turnSmoothTime = 0.1f;
-    float turnSmoothVelocity;
+    public float playerSpeed = 5.0f;
+    public float rotateSpeed = 125f;
+    public float gravity = -9.81f;
+    public Transform groundCheck;
+    public LayerMask groundMask;
+    public float groundDistance = 0.4f;
+    Vector3 velocity;
+    bool isGrounded;
+
 
     private void Awake()
         {
@@ -27,20 +32,27 @@ public class Moving : NetworkBehaviour
             if(!base.IsOwner)
                 return;
 
-        float Horizontal = Input.GetAxisRaw("Horizontal");
-        float Vertical = Input.GetAxisRaw("Vertical");
-        Vector3 direction = new Vector3(Horizontal, 0f, Vertical).normalized;
+            isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
-        if (direction.magnitude >= 0.1f)
-        {
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-            transform.rotation = Quaternion.Euler(0f, angle, 0f);
+            if(isGrounded && velocity.y < 0)
+                velocity.y = -2f;
 
-            Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
-            _characterController.Move(moveDir.normalized * playerSpeed * Time.deltaTime);
+            float Horizontal = Input.GetAxisRaw("Horizontal");
+            float Vertical = Input.GetAxisRaw("Vertical");
+            transform.Rotate(new Vector3(0f, Horizontal * rotateSpeed * Time.deltaTime));
+
+            Vector3 move = new Vector3(0f, Physics.gravity.y, Vertical) * playerSpeed * Time.deltaTime;
+            move = transform.TransformDirection(move);
+            _characterController.Move(move);
+
+            // Vector3 offset = new Vector3(horizontal, Physics.gravity.y, vertical) * (moveSpeed * Time.deltaTime);
+
+            _characterController.Move(move);
+
+            velocity.y += gravity * Time.deltaTime;
+
+            _characterController.Move(velocity * Time.deltaTime);
         }
-    }
 }
 
 

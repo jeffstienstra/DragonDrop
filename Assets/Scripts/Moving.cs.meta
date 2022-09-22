@@ -3,7 +3,11 @@ guid: 6812c99932abb49aeb5620bae6a7e9fc
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - _addedNetworkObject: {instanceID: 0}
+  - _networkObjectCache: {instanceID: 0}
+  - _characterController: {instanceID: 0}
+  - cam: {fileID: 5535510750031797748, guid: f267314d53e524cc387ed286d1bc250c, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
